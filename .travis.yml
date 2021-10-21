@@ -1,0 +1,25 @@
+language: python
+
+addons:
+  apt:
+    update: true
+
+install:
+  - sudo apt-get install -y gnat
+  - git clone https://github.com/ghdl/ghdl.git
+  - mkdir $TRAVIS_BUILD_DIR/ghdl/build
+  - cd $TRAVIS_BUILD_DIR/ghdl/build
+  - $TRAVIS_BUILD_DIR/ghdl/configure --prefix=$TRAVIS_BUILD_DIR/ghdl/
+  - make
+  - make install
+  - pip install vunit_hdl
+  - chmod +x $TRAVIS_BUILD_DIR/src/run.py
+  - export PATH="$TRAVIS_BUILD_DIR/ghdl/bin:$PATH"
+  
+before_script:
+  - cd $TRAVIS_BUILD_DIR/src
+  - gcc test_gen.c -o test_gen -std=c99
+  - ./test_gen --random-cases=200
+
+script:
+  - python $TRAVIS_BUILD_DIR/src/run.py
